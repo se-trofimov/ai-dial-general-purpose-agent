@@ -102,6 +102,13 @@ text-only; scanned images are not supported. Large files are returned in pages o
    - Attach [microwave_manual.txt](tests/microwave_manual.txt) and ask: `How should I clean the plate?` - should call RAG tool. The main criteria here is that this tool will be called, usually it will try to call the `file_content_extraction_tool`, but after fetching 1st page and seeing that there are more paged it should call RAG tool, also user can indicate to model that RAG tool should be called
    - Pay attention that tool SYSTEM prompt matters, tool description as well. Configure it to achieve best result!
 
+Install the RAG dependencies from `requirements.txt` and restart the agent. On
+first search it downloads the `all-MiniLM-L6-v2` embedding model; document text
+is embedded locally. Search results are sent to the configured DIAL model for
+answer generation. Document indexes are cached in memory for up to 24 hours;
+the file is downloaded and access checked on every search, and modifications
+cause a new index to be built. Restarting the agent clears the cache.
+
 ## Step 3
 **Now let's add Image generation tool**
 
