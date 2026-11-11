@@ -7,7 +7,7 @@ services:
   chat:
     ports:
       - "3000:3000"
-    image: epam/ai-dial-chat:development
+    image: epam/ai-dial-chat:0.49.10
     platform: linux/amd64
     depends_on:
       - themes

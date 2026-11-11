@@ -28,11 +28,13 @@ class GeneralPurposeAgent:
         self.state: dict[str, Any] = {TOOL_CALL_HISTORY_KEY: []}
 
     async def handle_request(self, deployment_name: str, choice: Choice, request: Request, response: Response) -> Message:
-        async with AsyncDial(
+        client = AsyncDial(
                 base_url=self.endpoint,
                 api_key=request.api_key,
                 api_version=request.api_version,
-        ) as client:
+        )
+        # aidial-client 0.3.0 has no public close/context-manager API.
+        async with client._http_client.internal_http_client:
             chunks = await client.chat.completions.create(
                 deployment_name=deployment_name,
                 messages=self._prepare_messages(request.messages),

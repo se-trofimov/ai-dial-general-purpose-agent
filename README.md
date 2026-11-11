@@ -46,6 +46,8 @@
 Start Docker Desktop (Linux containers). Replace `YOUR_DIAL_API_KEY` in
 `core/config.json` with your key locally; never commit the real key, and remove it
 after testing. Step 1 runs without tools; the tool TODOs belong to later steps.
+The chat image is pinned to `0.49.10`: the newer 1.x chat uses different
+environment variables and ports and is not compatible with this Compose setup.
 
 From the repository root in PowerShell:
 

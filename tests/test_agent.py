@@ -4,6 +4,7 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
+from aidial_client import AsyncDial
 from aidial_client.types.chat.response import ChatCompletionChunk
 from aidial_sdk.chat_completion import Message, Request, Role
 from starlette.requests import Request as HttpRequest
@@ -133,6 +134,23 @@ class AgentTests(unittest.IsolatedAsyncioTestCase):
                           for event in events for choice in event.get('choices', []))
         self.assertEqual(content, 'Hello world')
         self.assertIn('data: [DONE]', result.text)
+
+    async def test_real_sdk_stream_and_client_cleanup(self):
+        def respond(request):
+            return httpx.Response(200, headers={'content-type': 'text/event-stream'}, text=(
+                'data: {"id":"test","object":"chat.completion.chunk","created":0,'
+                '"choices":[{"index":0,"delta":{"content":"Hello"}}]}\n\n'
+                'data: [DONE]\n\n'
+            ))
+
+        transport_client = httpx.AsyncClient(transport=httpx.MockTransport(respond))
+        with patch('aidial_client._http_client._async.AsyncHTTPClient._create_internal_client',
+                   return_value=transport_client):
+            client = AsyncDial(base_url='http://localhost:8080', api_key='test')
+        self.dial.return_value = client
+        message = await self.agent.handle_request('gpt-4o', self.choice, self.request, MagicMock())
+        self.assertEqual(message.content, 'Hello')
+        self.assertTrue(transport_client.is_closed)
 
 
 class HistoryTests(unittest.TestCase):
