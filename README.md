@@ -41,6 +41,31 @@
    - Test that GPT 4o is working: `Hi, what can you do?`
    - Then test that General Purpose Agent is working: `Hi, what can you do?`
 
+### Running Step 1 on Windows
+
+Start Docker Desktop (Linux containers). Replace `YOUR_DIAL_API_KEY` in
+`core/config.json` with your key locally; never commit the real key, and remove it
+after testing. Step 1 runs without tools; the tool TODOs belong to later steps.
+
+From the repository root in PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install aidial-sdk==0.27.0 aidial-client==0.3.0 pydantic==2.12.3
+docker compose up -d
+.\.venv\Scripts\python.exe -m task.app
+```
+
+Open http://localhost:3000/ and test both deployments. The agent streams its reply
+and preserves conversation history. File processing and other tools are not yet
+enabled. For later steps install the full `requirements.txt`.
+
+Run the offline Step 1 tests (no API key or Docker needed):
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
+```
+
 ## Step 2
 **Time to add first tool to extract content from files**
 1. Provide implementation for the [tools/base.py](task/tools/base.py) according to TODO

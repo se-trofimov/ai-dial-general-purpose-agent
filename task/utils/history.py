@@ -28,9 +28,9 @@ def unpack_messages(messages: list[Message], state_history: list[dict[str, Any]]
                             else:
                                 result.append(history_msg)
 
-                    msg = copy.deepcopy(message)
-                    msg.custom_content = None
-                    result.append(msg.dict(exclude_none=True))
+            msg = copy.deepcopy(message)
+            msg.custom_content = None
+            result.append(msg.dict(exclude_none=True))
         else:
             attachments_urls_content = ''
             if message.custom_content and message.custom_content.attachments:
@@ -54,6 +54,7 @@ def unpack_messages(messages: list[Message], state_history: list[dict[str, Any]]
 
     if state_history:
         for history_msg in state_history:
+            history_msg = copy.deepcopy(history_msg)
             if history_msg.get(CUSTOM_CONTENT):
                 del history_msg[CUSTOM_CONTENT]
             result.append(history_msg)

@@ -7,13 +7,6 @@ from aidial_sdk.chat_completion import ChatCompletion, Request, Response
 from task.agent import GeneralPurposeAgent
 from task.prompts import SYSTEM_PROMPT
 from task.tools.base import BaseTool
-from task.tools.deployment.image_generation_tool import ImageGenerationTool
-from task.tools.files.file_content_extraction_tool import FileContentExtractionTool
-from task.tools.py_interpreter.python_code_interpreter_tool import PythonCodeInterpreterTool
-from task.tools.mcp.mcp_client import MCPClient
-from task.tools.mcp.mcp_tool import MCPTool
-from task.tools.rag.document_cache import DocumentCache
-from task.tools.rag.rag_tool import RagTool
 
 DIAL_ENDPOINT = os.getenv('DIAL_ENDPOINT', "http://localhost:8080")
 DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME', 'gpt-4o')
@@ -49,24 +42,20 @@ class GeneralPurposeAgentApplication(ChatCompletion):
         return []
 
     async def chat_completion(self, request: Request, response: Response) -> None:
-        #TODO:
-        # 1. If `self.tools` are absent then call `_create_tools` method and assign to the `self.tools`
-        # 2. Create `choice` (`with response.create_single_choice() as choice:`) and:
-        #   - Create GeneralPurposeAgent with:
-        #       - endpoint=DIAL_ENDPOINT
-        #       - system_prompt=SYSTEM_PROMPT
-        #       - tools=self.tools
-        #   - call `handle_request` on created agent with:
-        #       - choice=choice
-        #       - deployment_name=DEPLOYMENT_NAME
-        #       - request=request
-        #       - response=response
-        raise NotImplementedError()
+        if not self.tools:
+            self.tools = await self._create_tools()
+        with response.create_single_choice() as choice:
+            agent = GeneralPurposeAgent(
+                endpoint=DIAL_ENDPOINT,
+                system_prompt=SYSTEM_PROMPT,
+                tools=self.tools,
+            )
+            await agent.handle_request(DEPLOYMENT_NAME, choice, request, response)
 
-#TODO:
-# 1. Create DIALApp
-# 2. Create GeneralPurposeAgentApplication
-# 3. Add to created DIALApp chat_completion with:
-#       - deployment_name="general-purpose-agent"
-#       - impl=agent_app
-# 4. Run it with uvicorn: `uvicorn.run({CREATED_DIAL_APP}, port=5030, host="0.0.0.0")`
+
+app = DIALApp()
+agent_app = GeneralPurposeAgentApplication()
+app.add_chat_completion(deployment_name='general-purpose-agent', impl=agent_app)
+
+if __name__ == '__main__':
+    uvicorn.run(app, port=5030, host='0.0.0.0')
