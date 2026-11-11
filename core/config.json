@@ -3,9 +3,9 @@
   "applications": {
     "general-purpose-agent": {
       "displayName": "General Purpose Agent",
-      "description": "General Purpose Agent. Chat assistant; tools will be added in subsequent steps.",
+      "description": "General Purpose Agent. Chat assistant with text extraction from PDF, TXT, CSV and HTML files.",
       "endpoint": "http://host.docker.internal:5030/openai/deployments/general-purpose-agent/chat/completions",
-      "inputAttachmentTypes": ["image/png", "image/jpeg"],
+      "inputAttachmentTypes": ["image/png", "image/jpeg", "application/pdf", "text/html", "text/plain", "text/csv"],
       "forwardAuthToken": true
     }
   },

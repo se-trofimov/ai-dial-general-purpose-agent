@@ -7,6 +7,7 @@ from aidial_sdk.chat_completion import ChatCompletion, Request, Response
 from task.agent import GeneralPurposeAgent
 from task.prompts import SYSTEM_PROMPT
 from task.tools.base import BaseTool
+from task.tools.files.file_content_extraction_tool import FileContentExtractionTool
 
 DIAL_ENDPOINT = os.getenv('DIAL_ENDPOINT', "http://localhost:8080")
 DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME', 'gpt-4o')
@@ -39,7 +40,7 @@ class GeneralPurposeAgentApplication(ChatCompletion):
         # 5. Add PythonCodeInterpreterTool with DIAL_ENDPOINT, `http://localhost:8050/mcp` mcp_url, tool_name is
         #    `execute_code`, more detailed about tools see in repository https://github.com/khshanovskyi/mcp-python-code-interpreter
         # 6. Extend tools with MCP tools from `http://localhost:8051/mcp` (use method `_get_mcp_tools`)
-        return []
+        return [FileContentExtractionTool(DIAL_ENDPOINT)]
 
     async def chat_completion(self, request: Request, response: Response) -> None:
         if not self.tools:

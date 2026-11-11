@@ -80,6 +80,19 @@ Run the offline Step 1 tests (no API key or Docker needed):
    - Attach [report.csv](tests/report.csv) and ask: `What is top sale for category A?` - should get file content and provide '1700 on 2025-10-05'
    - Attach [microwave_manual.txt](tests/microwave_manual.txt) and ask: `How should I clean the plate?` - should use pagination (2-3 tool calls) to fetch content and then should provide the response
 
+Install the Step 2 dependencies in the same virtual environment, then restart the
+agent and DIAL Core to pick up the new tool and attachment types:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install pdfplumber==0.11.7 beautifulsoup4==4.14.2 pandas==2.3.3 tabulate==0.9.0
+docker compose restart core
+.\.venv\Scripts\python.exe -m task.app
+```
+
+Stop the existing agent with Ctrl+C before starting it again. PDF extraction is
+text-only; scanned images are not supported. Large files are returned in pages of
+10,000 characters. Check server logs and the tool stage if extraction fails.
+
 
 ## Step 3
 **As you have seen full content extraction from files is not efficient, we need to add RAG search capability to enhance our Agent**
